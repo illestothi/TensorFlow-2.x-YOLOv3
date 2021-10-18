@@ -6,7 +6,7 @@
 #   Website     : https://pylessons.com/
 #   GitHub      : https://github.com/pythonlessons/TensorFlow-2.x-YOLOv3
 #   Description : used to convert XML labels to YOLOv3 training labels
-#
+#   https://pylessons.com/YOLOv3-TF2-custrom-images/
 #================================================================
 import xml.etree.ElementTree as ET
 import os
@@ -14,13 +14,18 @@ import glob
 
 foldername = os.path.basename(os.getcwd())
 if foldername == "tools": os.chdir("..")
-
-
-data_dir = '/custom_dataset/'
-Dataset_names_path = "model_data/license_plate_names.txt"
-Dataset_train = "model_data/license_plate_train.txt"
-Dataset_test = "model_data/license_plate_test.txt"
-is_subfolder = False
+"""
+data_dir = "/home/iilles/Code/wheel/"  # '/custom_dataset/'
+Dataset_names_path = "custom_dataset/mnist.names"  # "model_data/license_plate_names.txt"
+Dataset_train = "custom_dataset/mnist_train.txt"  # "model_data/license_plate_train.txt"
+Dataset_validation = "custom_dataset/mnist_test.txt"  # "model_data/license_plate_test.txt"
+is_subfolder = True
+"""
+data_dir = "/IMAGES/car/"  # '/custom_dataset/'
+Dataset_names_path = "custom_dataset/mnist.names"  # "model_data/license_plate_names.txt"
+Dataset_train = "custom_dataset/mnist_train.txt"  # "model_data/license_plate_train.txt"
+Dataset_validation = "custom_dataset/mnist_test.txt"  # "model_data/license_plate_test.txt"
+is_subfolder = True
 
 Dataset_names = []
       
@@ -47,10 +52,14 @@ def ParseXML(img_folder, file):
         file.write(img_path+'\n')
 
 def run_XML_to_YOLOv3():
-    for i, folder in enumerate(['train','test']):
-        with open([Dataset_train,Dataset_test][i], "w") as file:
+    for i, folder in enumerate(['train', 'validation']):
+        with open([Dataset_train, Dataset_validation][i], "w") as file:
             print(os.getcwd()+data_dir+folder)
-            img_path = os.path.join(os.getcwd()+data_dir+folder)
+            if data_dir[0] == '*':  # '/':
+                img_path = os.path.join(data_dir+folder)
+            else:
+                img_path = os.path.join(os.getcwd() + data_dir + folder)
+            print('Image path: ', img_path)
             if is_subfolder:
                 for directory in os.listdir(img_path):
                     xml_path = os.path.join(img_path, directory)

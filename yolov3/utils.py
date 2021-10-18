@@ -158,12 +158,13 @@ def draw_bbox(image, bboxes, CLASSES=YOLO_COCO_CLASSES, show_label=True, show_co
             score_str = " {:.2f}".format(score) if show_confidence else ""
 
             if tracking: score_str = " "+str(score)
-
+            label = None
             try:
                 label = "{}".format(NUM_CLASS[class_ind]) + score_str
             except KeyError:
                 print("You received KeyError, this might be that you are trying to use yolo original weights")
                 print("while using custom classes, if using custom model in configs.py set YOLO_CUSTOM_WEIGHTS = True")
+                exit(1)
 
             # get text size
             (text_width, text_height), baseline = cv2.getTextSize(label, cv2.FONT_HERSHEY_COMPLEX_SMALL,
@@ -279,9 +280,13 @@ def postprocess_boxes(pred_bbox, original_image, input_size, score_threshold):
 
 
 def detect_image(Yolo, image_path, output_path, input_size=416, show=False, CLASSES=YOLO_COCO_CLASSES, score_threshold=0.3, iou_threshold=0.45, rectangle_colors=''):
+    bboxes = []
     original_image      = cv2.imread(image_path)
-    original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
-    original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    try:
+        original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+        original_image      = cv2.cvtColor(original_image, cv2.COLOR_BGR2RGB)
+    except:
+        return bboxes
 
     image_data = image_preprocess(np.copy(original_image), [input_size, input_size])
     image_data = image_data[np.newaxis, ...].astype(np.float32)
@@ -314,7 +319,7 @@ def detect_image(Yolo, image_path, output_path, input_size=416, show=False, CLAS
         # To close the window after the required kill value was provided
         cv2.destroyAllWindows()
         
-    return image
+    return bboxes
 
 def Predict_bbox_mp(Frames_data, Predicted_data, Processing_times):
     gpus = tf.config.experimental.list_physical_devices('GPU')
